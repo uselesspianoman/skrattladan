@@ -1196,6 +1196,9 @@ $('reacts').addEventListener('click', e => {
 });
 
 /* djuplänk: #KOD */
+// Klickar man på en ny inbjudan medan sidan redan är öppen byter webbläsaren bara
+// hash utan att ladda om — då måste vi ladda om själva, annars händer ingenting.
+window.addEventListener('hashchange', () => { location.reload(); });
 (function(){
   const h = (location.hash || '').replace('#','').toUpperCase().replace(/[^A-Z0-9]/g,'').slice(0,4);
   if (h.length === 4){
