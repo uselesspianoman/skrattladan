@@ -782,12 +782,14 @@ function paint(){
     $('g-clock').classList.toggle('low', G.secs <= 10);
   }
 
-  // signatur: rita bara om strukturen ändras (annars förlorar vi fokus i textfält)
+  // Signaturen styr när vyn byggs om. Den får BARA innehålla sådant som ändrar
+  // strukturen — allt som motparten gör löpande (gissningar, låsta svar, foul)
+  // uppdateras via liveUpdate(), annars raderas det man håller på att skriva/rita.
   const sig = [G.idx, G.step, G.d.phase||'', r.g,
-               r.g==='lucka' ? [!!G.d.ans[1], !!G.d.ans[2], G.d.rate[1], G.d.rate[2]].join(',') : '',
-               r.g==='kludd' ? G.d.guesses.length + ':' + G.d.solved : '',
-               r.g==='tabu' ? G.d.guesses.length + ':' + G.d.cleared.length + ':' + G.d.foulAt : '',
-               G.ready[1], G.ready[2]].join('|');
+               r.g==='lucka' ? String(!!G.d.ans[seat]) + ':' + String(!!G.d.rate[seat]) : '',
+               r.g==='kludd' ? String(G.d.solved) : '',
+               r.g==='tabu' ? String(G.d.cleared.length) : '',
+               String(G.ready[seat])].join('|');
 
   if (sig !== lastSig){ lastSig = sig; buildBody(); }
   else liveUpdate();
@@ -796,6 +798,7 @@ function paint(){
 function buildBody(){
   const r = round();
   const body = $('g-body');
+  if (ui.roundKey !== G.idx){ ui.roundKey = G.idx; ui.strokes = []; ui.lastFoul = 0; }
   if (ui.cleanCanvas){ ui.cleanCanvas(); ui.cleanCanvas = null; }
   ui.ctx = null; ui.cv = null;
   body.innerHTML = '';
@@ -869,7 +872,7 @@ function buildKludd(body, r){
   const iDraw = seat === r.a;
   const d = G.d;
   if (iDraw){
-    ui.color = ui.color || '#14323c'; ui.pen = ui.pen || 5; ui.strokes = [];
+    ui.color = ui.color || '#14323c'; ui.pen = ui.pen || 5;
     body.innerHTML =
       `<p class="note">Rita det här — inga bokstäver, inga siffror!</p>
        <div class="secret">${esc(d.word.toUpperCase())}</div>
@@ -977,6 +980,12 @@ function buildTabu(body, r){
 function liveUpdate(){
   const r = round();
   if (!r || G.step !== 'play') return;
+  if (r.g === 'kludd' || r.g === 'tabu') renderFeed(G.d.guesses);
+  if (r.g === 'lucka' && G.d.phase === 'write' && G.d.ans[seat]){
+    const you = seat === 1 ? 2 : 1;
+    const n = document.querySelector('#g-body .note');
+    if (n) n.textContent = G.d.ans[you] ? 'Båda är låsta. Avslöjar…' : 'Låst. Väntar på ' + G.names[you] + '…';
+  }
   if (r.g === 'tabu' && seat !== r.a){
     const el = $('live');
     if (el){
