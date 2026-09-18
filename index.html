@@ -1,0 +1,1203 @@
+<!doctype html>
+<html lang="sv">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Skrattlådan</title>
+<meta name="description" content="Partyspel för två. Tre minispel, en länk, noll installation.">
+<meta name="theme-color" content="#08333f">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎉</text></svg>">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Nunito:ital,wght@0,400;0,700;0,900;1,700&family=DM+Mono:wght@500&display=swap">
+<style>
+:root{
+  --deep:#08333f;
+  --deep2:#0b4050;
+  --panel:#0f4e60;
+  --panel2:#146074;
+  --line:#1d7186;
+  --text:#f2fbfb;
+  --dim:#8fc4ce;
+  --coral:#ff6b4a;
+  --sun:#ffd23f;
+  --mint:#54e6b8;
+  --pink:#ff5fa2;
+  --bad:#ff5c5c;
+  --r:16px;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+[hidden]{display:none !important}
+html,body{height:100%}
+body{
+  margin:0;
+  background:
+    radial-gradient(90% 55% at 15% 0%, #12576a 0%, transparent 62%),
+    radial-gradient(80% 50% at 90% 100%, #0d4a5c 0%, transparent 60%),
+    var(--deep);
+  background-attachment:fixed;
+  color:var(--text);
+  font-family:'Nunito',system-ui,'Segoe UI',sans-serif;
+  font-size:16px;line-height:1.5;
+  padding-block:14px 24px;
+  padding-left:16px;padding-right:16px;
+  -webkit-font-smoothing:antialiased;
+  overflow-x:hidden;
+}
+h1,h2,h3{font-family:'Fredoka',system-ui,sans-serif;font-weight:700;margin:0;text-wrap:balance;letter-spacing:.005em}
+.wrap{max-width:660px;margin:0 auto;display:flex;flex-direction:column;gap:13px;min-height:calc(100vh - 38px)}
+
+/* ---------- top bar ---------- */
+.top{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.brand{display:flex;align-items:baseline;gap:9px}
+.brand h1{font-size:clamp(23px,6vw,32px);line-height:1}
+.brand h1 span{color:var(--sun)}
+.brand em{font-style:normal;font-family:'DM Mono',monospace;font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--dim)}
+.scorebar{display:flex;gap:7px;align-items:center}
+.sc{
+  display:flex;align-items:center;gap:7px;border-radius:999px;padding:5px 12px 5px 8px;
+  background:var(--panel);border:1px solid var(--line);font-weight:900;font-size:14px;
+}
+.sc .av{width:22px;height:22px;border-radius:50%;display:grid;place-items:center;font-size:12px;font-weight:900;color:#06262f}
+.sc.p1 .av{background:var(--coral)} .sc.p2 .av{background:var(--mint)}
+.sc .nm{max-width:9ch;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-weight:700}
+.sc .pt{font-family:'DM Mono',monospace;font-size:15px;color:var(--sun);font-variant-numeric:tabular-nums}
+
+/* ---------- card ---------- */
+.card{
+  background:linear-gradient(180deg,var(--panel2),var(--panel));
+  border:1px solid var(--line);border-radius:var(--r);
+  box-shadow:0 16px 34px rgba(0,0,0,.34);
+  padding:18px;
+  display:flex;flex-direction:column;gap:14px;
+}
+.card.tight{padding:14px}
+.view{display:none}
+.view.on{display:flex;flex-direction:column;gap:13px;flex:1}
+
+/* ---------- lobby ---------- */
+.hero{text-align:center;display:flex;flex-direction:column;gap:9px;align-items:center}
+.hero h2{font-size:clamp(19px,4.6vw,26px)}
+.hero p{margin:0;color:var(--dim);max-width:44ch}
+.minis{display:grid;gap:9px}
+.mini{display:flex;gap:12px;align-items:flex-start;padding:11px 13px;border-radius:12px;background:rgba(3,30,38,.42);border-left:4px solid var(--c)}
+.mini .no{font-family:'Fredoka',sans-serif;font-size:19px;color:var(--c);line-height:1;min-width:1.1em}
+.mini b{font-family:'Fredoka',sans-serif;font-size:15px;display:block}
+.mini span{font-size:14px;color:var(--dim);line-height:1.38}
+.m1{--c:var(--sun)} .m2{--c:var(--pink)} .m3{--c:var(--mint)}
+
+.field{display:flex;flex-direction:column;gap:6px}
+.field label{font-family:'DM Mono',monospace;font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--dim)}
+input[type=text],textarea{
+  font:700 16px/1.35 'Nunito',sans-serif;color:var(--text);width:100%;
+  background:rgba(3,28,36,.6);border:1.5px solid var(--line);border-radius:11px;padding:11px 13px;resize:none;
+}
+input::placeholder,textarea::placeholder{color:#5d94a2;font-weight:400}
+input:focus-visible,textarea:focus-visible{outline:2.5px solid var(--sun);outline-offset:1px;border-color:transparent}
+.btn{
+  font-family:'Fredoka',sans-serif;font-weight:600;font-size:16px;border:none;border-radius:12px;padding:13px 22px;cursor:pointer;
+  background:linear-gradient(180deg,#ff8365,#f0522c);color:#fff;box-shadow:0 7px 0 #b93a1c, 0 12px 22px rgba(0,0,0,.3);
+  transition:transform .09s ease,box-shadow .09s ease,filter .12s;
+}
+.btn:hover{filter:brightness(1.06)}
+.btn:active{transform:translateY(4px);box-shadow:0 3px 0 #b93a1c,0 6px 14px rgba(0,0,0,.3)}
+.btn:focus-visible{outline:3px solid var(--sun);outline-offset:3px}
+.btn[disabled]{opacity:.45;cursor:not-allowed;box-shadow:0 7px 0 #b93a1c}
+.btn.alt{background:linear-gradient(180deg,#6ff0c6,#2fc79b);color:#053b2d;box-shadow:0 7px 0 #1d8f6e,0 12px 22px rgba(0,0,0,.3)}
+.btn.alt:active{box-shadow:0 3px 0 #1d8f6e}
+.btn.ghost{background:transparent;color:var(--dim);border:1.5px solid var(--line);box-shadow:none;font-size:14px;padding:10px 16px}
+.btn.ghost:hover{color:var(--text);border-color:var(--sun)}
+.btn.ghost:active{transform:none;box-shadow:none}
+.btn.sm{font-size:14px;padding:9px 15px;box-shadow:0 5px 0 #b93a1c}
+.row{display:flex;gap:9px;flex-wrap:wrap}
+.row.mid{justify-content:center;align-items:center}
+.grow{flex:1 1 150px}
+.err{color:var(--bad);font-weight:700;font-size:14px;min-height:1.2em;margin:0;text-align:center}
+.note{color:var(--dim);font-size:14px;margin:0;text-align:center;text-wrap:pretty}
+
+/* ---------- code ---------- */
+.codewrap{display:flex;flex-direction:column;align-items:center;gap:11px;text-align:center;padding:6px 0}
+.bigcode{
+  font-family:'DM Mono',monospace;font-size:clamp(46px,15vw,76px);letter-spacing:.2em;color:var(--sun);
+  padding-left:.2em;line-height:1.05;text-shadow:0 0 34px rgba(255,210,63,.4);
+}
+#joincode{font-family:'DM Mono',monospace;font-size:34px;letter-spacing:.3em;text-align:center;text-transform:uppercase;padding-left:22px}
+.linkbox{display:flex;gap:7px;width:100%;max-width:420px}
+.linkbox input{font:500 13px/1.3 'DM Mono',monospace;padding:10px 11px}
+.waiting{display:inline-flex;gap:9px;align-items:center;color:var(--dim);font-weight:700}
+.dot{width:9px;height:9px;border-radius:50%;background:var(--mint);animation:blip 1.15s infinite}
+@keyframes blip{0%,100%{opacity:.25;transform:scale(.65)}50%{opacity:1;transform:scale(1)}}
+
+/* ---------- game shell ---------- */
+.gamehead{display:flex;align-items:center;gap:10px;justify-content:space-between;flex-wrap:wrap}
+.chip{
+  font-family:'DM Mono',monospace;font-size:11px;letter-spacing:.13em;text-transform:uppercase;
+  border-radius:999px;padding:5px 11px;background:color-mix(in srgb,var(--c) 22%,transparent);
+  color:var(--c);border:1px solid color-mix(in srgb,var(--c) 45%,transparent);white-space:nowrap;
+}
+.gamehead h2{font-size:clamp(17px,4.2vw,21px);color:var(--c)}
+.clock{
+  font-family:'DM Mono',monospace;font-size:19px;color:var(--sun);font-variant-numeric:tabular-nums;
+  display:flex;align-items:center;gap:8px;
+}
+.clock .ring{width:36px;height:36px;border-radius:50%;background:conic-gradient(var(--sun) var(--p,100%),rgba(255,255,255,.09) 0);
+  display:grid;place-items:center;font-size:12px;color:var(--text)}
+.clock.low{color:var(--bad)}
+.clock.low .ring{background:conic-gradient(var(--bad) var(--p,100%),rgba(255,255,255,.09) 0)}
+
+.prompt{
+  font-family:'Fredoka',sans-serif;font-weight:600;font-size:clamp(19px,5vw,27px);line-height:1.28;
+  text-align:center;padding:16px 10px;text-wrap:balance;
+}
+.prompt .blank{color:var(--sun);border-bottom:4px dotted var(--sun);padding:0 .35em}
+.secret{
+  text-align:center;font-family:'Fredoka',sans-serif;font-weight:700;
+  font-size:clamp(28px,8vw,44px);color:var(--sun);letter-spacing:.01em;line-height:1.1;
+}
+.banned{display:flex;gap:7px;flex-wrap:wrap;justify-content:center}
+.banned span{background:rgba(255,92,92,.14);border:1px solid rgba(255,92,92,.45);color:#ffb0b0;
+  border-radius:999px;padding:4px 11px;font-weight:700;font-size:14px;text-decoration:line-through}
+
+.answers{display:grid;gap:10px}
+.ans{border-radius:13px;padding:13px 15px;background:rgba(3,30,38,.5);border-left:5px solid var(--c);display:flex;flex-direction:column;gap:5px}
+.ans .by{font-family:'DM Mono',monospace;font-size:11px;letter-spacing:.13em;text-transform:uppercase;color:var(--c)}
+.ans .tx{font-size:clamp(17px,4.4vw,21px);font-weight:900;line-height:1.3;word-break:break-word}
+.ans.p1{--c:var(--coral)} .ans.p2{--c:var(--mint)}
+.stars{display:flex;gap:6px;justify-content:center;flex-wrap:wrap}
+.star{
+  border:1.5px solid var(--line);background:rgba(3,28,36,.5);color:var(--dim);border-radius:12px;
+  width:54px;height:52px;cursor:pointer;font-size:23px;line-height:1;display:grid;place-items:center;
+  transition:transform .1s,border-color .1s,background .1s;
+}
+.star:hover{transform:translateY(-3px) scale(1.06);border-color:var(--sun)}
+.star.pick{background:var(--sun);border-color:var(--sun);transform:translateY(-3px) scale(1.06)}
+.star:focus-visible{outline:3px solid var(--sun);outline-offset:2px}
+
+/* drawing */
+.canvaswrap{position:relative;width:100%;border-radius:13px;overflow:hidden;border:1px solid var(--line);background:#f7fbfb}
+canvas{display:block;width:100%;height:auto;touch-action:none;cursor:crosshair}
+.tools{display:flex;gap:7px;flex-wrap:wrap;justify-content:center}
+.tool{border:1.5px solid var(--line);background:rgba(3,28,36,.5);color:var(--text);border-radius:10px;padding:8px 13px;
+  cursor:pointer;font-weight:700;font-size:14px;font-family:'Nunito',sans-serif}
+.tool.on{border-color:var(--sun);background:rgba(255,210,63,.16);color:var(--sun)}
+.tool:focus-visible{outline:3px solid var(--sun);outline-offset:2px}
+.swatch{width:26px;height:26px;border-radius:7px;border:2px solid transparent;cursor:pointer;padding:0}
+.swatch.on{border-color:var(--sun);transform:scale(1.12)}
+
+/* live feed */
+.feed{display:flex;flex-direction:column;gap:6px;max-height:172px;overflow-y:auto;padding-right:3px}
+.g{padding:7px 12px;border-radius:11px;background:rgba(3,30,38,.5);font-weight:700;font-size:15px;word-break:break-word}
+.g.me{background:rgba(255,107,74,.16);border:1px solid rgba(255,107,74,.35)}
+.g.ok{background:rgba(84,230,184,.18);border:1px solid var(--mint);color:var(--mint)}
+.g small{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--dim);display:block}
+.live{
+  min-height:74px;border-radius:13px;background:rgba(3,30,38,.5);border:1.5px dashed var(--line);
+  padding:13px 15px;font-size:clamp(17px,4.4vw,21px);font-weight:900;line-height:1.35;word-break:break-word;
+}
+.live.empty{color:#5d94a2;font-weight:400;font-style:italic}
+.live.foul{border-color:var(--bad);background:rgba(255,92,92,.16);animation:shake .4s}
+@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-8px)}75%{transform:translateX(8px)}}
+.cleared{display:flex;gap:6px;flex-wrap:wrap;justify-content:center}
+.cleared span{background:rgba(84,230,184,.15);border:1px solid rgba(84,230,184,.4);color:var(--mint);
+  border-radius:999px;padding:3px 10px;font-weight:700;font-size:13px}
+
+/* result */
+.result{display:flex;flex-direction:column;gap:12px;align-items:center;text-align:center}
+.result h2{font-size:clamp(21px,5.5vw,29px)}
+.gained{display:flex;gap:14px;justify-content:center;flex-wrap:wrap}
+.gain{border-radius:13px;padding:11px 17px;background:rgba(3,30,38,.5);border:1px solid var(--line);min-width:112px}
+.gain .who{font-family:'DM Mono',monospace;font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--dim)}
+.gain .val{font-family:'Fredoka',sans-serif;font-size:27px;color:var(--sun);line-height:1.1}
+
+/* reactions */
+.reacts{display:flex;gap:6px;justify-content:center;flex-wrap:wrap}
+.react{border:1.5px solid var(--line);background:rgba(3,28,36,.5);border-radius:999px;width:44px;height:38px;
+  font-size:19px;cursor:pointer;line-height:1;display:grid;place-items:center;transition:transform .1s,border-color .1s}
+.react:hover{transform:translateY(-3px) scale(1.1);border-color:var(--sun)}
+.react:focus-visible{outline:3px solid var(--sun);outline-offset:2px}
+#floats{position:fixed;inset:0;pointer-events:none;z-index:40;overflow:hidden}
+.fl{position:absolute;font-size:38px;animation:rise 2.1s ease-out forwards}
+@keyframes rise{0%{opacity:0;transform:translateY(20px) scale(.5)}15%{opacity:1;transform:translateY(0) scale(1.15)}100%{opacity:0;transform:translateY(-190px) scale(1)}}
+
+/* winner */
+.finale{align-items:center;text-align:center;gap:14px}
+.trophy{font-size:64px;line-height:1;animation:pop .6s cubic-bezier(.2,1.4,.4,1)}
+@keyframes pop{from{transform:scale(0) rotate(-25deg)}to{transform:none}}
+.finale h2{font-size:clamp(26px,7.5vw,40px);color:var(--sun)}
+.tally{font-family:'DM Mono',monospace;font-size:30px;letter-spacing:.1em;font-variant-numeric:tabular-nums}
+
+.status{font-family:'DM Mono',monospace;font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--dim);text-align:center}
+.spacer{flex:1}
+@media (max-width:430px){
+  .card{padding:14px}
+  .star{width:48px;height:47px;font-size:20px}
+}
+@media (prefers-reduced-motion:reduce){*{animation-duration:.01ms !important;transition-duration:.01ms !important}}
+</style>
+</head>
+<body>
+<div id="floats"></div>
+<div class="wrap">
+
+  <div class="top">
+    <div class="brand">
+      <h1>Skratt<span>lådan</span></h1>
+      <em id="modetag">partyspel för två</em>
+    </div>
+    <div class="scorebar" id="scorebar" hidden>
+      <div class="sc p1"><span class="av">1</span><span class="nm" id="sc1n">—</span><span class="pt" id="sc1p">0</span></div>
+      <div class="sc p2"><span class="av">2</span><span class="nm" id="sc2n">—</span><span class="pt" id="sc2p">0</span></div>
+    </div>
+  </div>
+
+  <!-- ============ LOBBY ============ -->
+  <section class="view on" id="v-lobby">
+    <div class="card">
+      <div class="hero">
+        <h2>Tre minispel. En länk. Noll installation.</h2>
+        <p>Du skapar ett rum och skickar länken. Kompisen klickar och är inne — inget konto, ingen nedladdning.</p>
+      </div>
+      <div class="minis">
+        <div class="mini m1"><span class="no">1</span><div><b>Fyll i luckan</b><span>En absurd mening med ett hål i. Ni skriver varsitt svar i smyg — sen avslöjas båda samtidigt och ni sätter skrattbetyg på varandra.</span></div></div>
+        <div class="mini m2"><span class="no">2</span><div><b>Kluddgissning</b><span>En ritar, den andra gissar medan pennan fortfarande går. Ritaren får inte skriva ett ord.</span></div></div>
+        <div class="mini m3"><span class="no">3</span><div><b>Förbjudna ord</b><span>Beskriv ordet — men fem ord är spärrade. Motståndaren ser varje bokstav du skriver i realtid.</span></div></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="field">
+        <label for="nick">Vad heter du?</label>
+        <input type="text" id="nick" maxlength="12" placeholder="Skriv ditt namn" autocomplete="off">
+      </div>
+      <div class="row">
+        <button class="btn grow" id="b-create">Skapa rum</button>
+        <button class="btn alt grow" id="b-joinview">Gå med i rum</button>
+      </div>
+      <p class="err" id="lobby-err"></p>
+      <p class="status" id="netstatus">Ansluter till matchningstjänsten…</p>
+    </div>
+  </section>
+
+  <!-- ============ JOIN ============ -->
+  <section class="view" id="v-join">
+    <div class="card">
+      <div class="codewrap">
+        <h2>Knappa in koden</h2>
+        <input type="text" id="joincode" maxlength="4" autocomplete="off" spellcheck="false" inputmode="latin" style="max-width:250px">
+        <div class="field" style="max-width:250px;width:100%">
+          <label for="nick2">Ditt namn</label>
+          <input type="text" id="nick2" maxlength="12" placeholder="Skriv ditt namn" autocomplete="off">
+        </div>
+        <p class="err" id="join-err"></p>
+        <div class="row mid">
+          <button class="btn" id="b-join">Gå med</button>
+          <button class="btn ghost" data-back>Tillbaka</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ WAIT ============ -->
+  <section class="view" id="v-wait">
+    <div class="card">
+      <div class="codewrap">
+        <h2>Rummet är öppet</h2>
+        <div class="bigcode" id="wait-code">····</div>
+        <p class="note">Skicka länken till din kompis. Hen kommer rakt in.</p>
+        <div class="linkbox">
+          <input type="text" id="sharelink" readonly>
+          <button class="btn sm" id="b-copy">Kopiera</button>
+        </div>
+        <p class="waiting"><span class="dot"></span> Väntar på spelare 2…</p>
+        <button class="btn ghost" data-back>Avbryt</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ GAME ============ -->
+  <section class="view" id="v-game">
+    <div class="card" id="gamecard">
+      <div class="gamehead">
+        <div style="display:flex;gap:9px;align-items:center;flex-wrap:wrap">
+          <span class="chip" id="g-chip">Runda 1/6</span>
+          <h2 id="g-title">Fyll i luckan</h2>
+        </div>
+        <div class="clock" id="g-clock" hidden><span class="ring" id="g-ring">0</span></div>
+      </div>
+      <div id="g-body"></div>
+    </div>
+    <div class="reacts" id="reacts">
+      <button class="react" data-emo="😂">😂</button>
+      <button class="react" data-emo="😱">😱</button>
+      <button class="react" data-emo="👏">👏</button>
+      <button class="react" data-emo="🤨">🤨</button>
+      <button class="react" data-emo="💀">💀</button>
+      <button class="react" data-emo="🔥">🔥</button>
+    </div>
+    <div class="spacer"></div>
+    <p class="status" id="g-status"></p>
+  </section>
+
+  <!-- ============ OVER ============ -->
+  <section class="view" id="v-over">
+    <div class="card">
+      <div class="result finale">
+        <div class="trophy" id="tr">🏆</div>
+        <h2 id="over-head">Vinnare</h2>
+        <div class="tally" id="over-tally">0 — 0</div>
+        <p class="note" id="over-note"></p>
+        <div class="row mid">
+          <button class="btn" id="b-again">Spela igen</button>
+          <button class="btn ghost" data-back>Avsluta</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/peerjs/1.5.5/peerjs.min.js"></script>
+<script>
+(function(){
+"use strict";
+
+/* ======================= INNEHÅLL ======================= */
+const LUCKOR = [
+ "Det värsta man kan hitta i sin jackficka: ___",
+ "Min gravsten kommer att lyda: ___",
+ "Anledningen till att jag blev utslängd från IKEA: ___",
+ "Det sämsta namnet på en ny glassmak: ___",
+ "Vad katten tänker när den stirrar på mig klockan tre på natten: ___",
+ "Den mest opassande saken att viska till någon i en hiss: ___",
+ "Rubriken i lokaltidningen efter min semester: ___",
+ "En riktigt dålig ursäkt för att komma en timme sent: ___",
+ "Det som absolut inte ska stå i ett CV: ___",
+ "Den värsta superkraften man kan bli tilldelad: ___",
+ "Vad som står på min t-shirt i mardrömmen: ___",
+ "Sämsta sättet att avsluta ett mejl till chefen: ___",
+ "Det konstigaste man kan beställa på en pizzeria: ___",
+ "Vad min telefon skulle säga om den kunde prata: ___",
+ "Ett fruktansvärt namn på en husbåt: ___",
+ "Sämsta möjliga present till någon som fyller 40: ___",
+ "Vad som hände när jag försökte imponera på någon: ___",
+ "Den mest olämpliga låten på ett begravningskaffe: ___",
+ "Vad jag googlade klockan 02:14 i natt: ___",
+ "En regel som borde finnas på alla bussar: ___",
+ "Det sämsta stället att somna på: ___",
+ "Ett nytt svenskt mästerskap som ingen bad om: ___",
+ "Sämsta möjliga sak att säga till en polis: ___",
+ "Vad grannen tror att jag håller på med där inne: ___",
+ "En produkt som absolut inte behöver en app: ___",
+ "Det konstigaste skälet att ringa kundtjänst: ___",
+ "Vad som borde stå på varningsetiketten på mig: ___",
+ "Den värsta frågan att få på en anställningsintervju: ___",
+ "Vad jag viskar till mig själv innan något går fel: ___",
+ "Det mest opraktiska stället att förvara sina nycklar: ___",
+ "En helt ny olympisk gren: ___",
+ "Vad som gömmer sig längst bak i min frys: ___"
+];
+
+const KLUDD = ["traktor","pingvin","tandborste","astronaut","brevlåda","hängmatta","korvkiosk","dammsugare",
+ "snögubbe","popcorn","kaktus","sjöjungfru","brandbil","ubåt","kanelbulle","elefant","gitarr","vindkraftverk",
+ "discokula","paraply","hoppborg","glasögon","tvättmaskin","isbjörn","husvagn","trollkarl","skattkista","fyrtorn",
+ "våffla","robotdammsugare","berg- och dalbana","tandläkare","ninja","kompass","jultomte","stekpanna","luftballong",
+ "sköldpadda","skottkärra","rullgardin","enhörning","brevduva","surfbräda","kaffekokare"];
+
+const TABU = [
+ {w:"PIZZA", b:["ost","italiensk","deg","mat","ugn"]},
+ {w:"TANDBORSTE", b:["tänder","mun","borsta","badrum","tandkräm"]},
+ {w:"FOTBOLL", b:["sport","mål","boll","spark","plan"]},
+ {w:"SEMESTER", b:["ledig","resa","sol","jobb","vecka"]},
+ {w:"KAFFE", b:["dricka","koffein","svart","bönor","kopp"]},
+ {w:"SNÖ", b:["vinter","kall","vit","faller","skotta"]},
+ {w:"HUND", b:["husdjur","skäller","svans","katt","koppel"]},
+ {w:"MOBIL", b:["telefon","ringa","app","skärm","ficka"]},
+ {w:"BIBLIOTEK", b:["böcker","låna","tyst","läsa","hylla"]},
+ {w:"GLASS", b:["kall","sommar","strut","sött","smälta"]},
+ {w:"CYKEL", b:["hjul","trampa","pedal","styre","åka"]},
+ {w:"BRÖLLOP", b:["gifta","kyrka","ring","klänning","par"]},
+ {w:"ASTRONAUT", b:["rymden","raket","måne","dräkt","stjärnor"]},
+ {w:"TVÄTTMASKIN", b:["kläder","tvätta","vatten","snurra","tvättstuga"]},
+ {w:"JULAFTON", b:["jul","klappar","gran","tomte","december"]},
+ {w:"TUNNELBANA", b:["tåg","station","stockholm","spår","åka"]},
+ {w:"PARAPLY", b:["regn","blöt","väder","fälla","skydda"]},
+ {w:"GITARR", b:["sträng","spela","musik","instrument","band"]},
+ {w:"LOPPIS", b:["begagnat","sälja","billigt","prylar","marknad"]},
+ {w:"HISS", b:["våning","upp","knapp","trappa","åka"]},
+ {w:"BASTU", b:["varmt","svettas","ånga","finsk","bad"]},
+ {w:"KORV", b:["grilla","mat","kiosk","bröd","äta"]},
+ {w:"MOTORSÅG", b:["såga","träd","skog","motor","verktyg"]},
+ {w:"FÖDELSEDAG", b:["år","fylla","tårta","present","fest"]},
+ {w:"PANNKAKA", b:["stekpanna","smet","torsdag","sylt","äta"]},
+ {w:"FYRVERKERI", b:["nyår","smälla","raket","himlen","ljus"]},
+ {w:"SIMHALL", b:["bad","vatten","simma","klor","bassäng"]},
+ {w:"VÄCKARKLOCKA", b:["morgon","sova","ringa","tid","vakna"]},
+ {w:"SVAMP", b:["skog","plocka","kantarell","äta","mark"]},
+ {w:"SKATEBOARD", b:["bräda","hjul","åka","ramp","trick"]}
+];
+
+const ROUNDS = [
+  {g:'lucka'}, {g:'kludd', a:1}, {g:'tabu', a:1},
+  {g:'lucka'}, {g:'kludd', a:2}, {g:'tabu', a:2}
+];
+const TITLES = {lucka:'Fyll i luckan', kludd:'Kluddgissning', tabu:'Förbjudna ord'};
+const COLORS = {lucka:'var(--sun)', kludd:'var(--pink)', tabu:'var(--mint)'};
+const DRAW_SECONDS = 75, TABU_SECONDS = 75, WRITE_SECONDS = 70;
+
+/* ======================= HJÄLP ======================= */
+const $ = id => document.getElementById(id);
+const views = {lobby:$('v-lobby'), join:$('v-join'), wait:$('v-wait'), game:$('v-game'), over:$('v-over')};
+function show(n){ for (const k in views) views[k].classList.toggle('on', k === n); }
+function esc(s){ return String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+function rndCode(){ let s=''; const a='ABCDEFGHJKLMNPQRSTUVWXYZ23456789'; for(let i=0;i<4;i++) s+=a[Math.floor(Math.random()*a.length)]; return s; }
+function shuffled(n){ const a=[...Array(n).keys()]; for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];} return a; }
+function norm(s){ return String(s||'').toLowerCase().replace(/[\s\-_.,!?:;'"]/g,'').replace(/å/g,'a').replace(/ä/g,'a').replace(/ö/g,'o'); }
+
+function floatEmoji(e){
+  const d = document.createElement('div');
+  d.className = 'fl'; d.textContent = e;
+  d.style.left = (12 + Math.random()*72) + '%';
+  d.style.bottom = '16%';
+  $('floats').appendChild(d);
+  setTimeout(()=>d.remove(), 2200);
+}
+
+let myName = '';
+try { myName = localStorage.getItem('skratt.name') || ''; } catch(e){}
+$('nick').value = myName; $('nick2').value = myName;
+function setName(v){
+  myName = (v||'').trim().slice(0,12);
+  $('nick').value = myName; $('nick2').value = myName;
+  try { localStorage.setItem('skratt.name', myName); } catch(e){}
+}
+$('nick').addEventListener('input', e => setName(e.target.value));
+$('nick2').addEventListener('input', e => setName(e.target.value));
+function nameOr(fb){ return myName || fb; }
+
+/* ======================= NÄT ======================= */
+const PREFIX = 'skrattladan-v1-';
+const Net = {
+  peer:null, conn:null, isHost:false, code:null, ready:false,
+  onData:null, onOpen:null, onClose:null
+};
+
+function makePeer(id){
+  return new Promise((resolve, reject) => {
+    if (typeof Peer === 'undefined'){ reject(new Error('noscript')); return; }
+    const p = new Peer(id, {debug:0});
+    let settled = false;
+    const to = setTimeout(() => { if(!settled){ settled=true; try{p.destroy();}catch(e){} reject(new Error('timeout')); } }, 12000);
+    p.on('open', () => { if(settled) return; settled=true; clearTimeout(to); resolve(p); });
+    p.on('error', err => {
+      if (settled){ handlePeerError(err); return; }
+      settled = true; clearTimeout(to); try{p.destroy();}catch(e){}
+      reject(err);
+    });
+  });
+}
+
+function handlePeerError(err){
+  const type = err && err.type;
+  if (type === 'peer-unavailable'){ $('join-err').textContent = 'Ingen hittade med den koden. Kolla att den stämmer.'; return; }
+  if (type === 'network' || type === 'server-error' || type === 'socket-error'){
+    setStatus('Tappade kontakten med matchningstjänsten.');
+  }
+}
+
+function wireConn(conn){
+  Net.conn = conn;
+  conn.on('open', () => { Net.ready = true; Net.onOpen && Net.onOpen(); });
+  conn.on('data', d => { try { Net.onData && Net.onData(d); } catch(e){} });
+  conn.on('close', () => { Net.ready = false; Net.onClose && Net.onClose(); });
+  conn.on('error', () => {});
+}
+
+function send(obj){
+  if (Net.conn && Net.ready){ try { Net.conn.send(obj); } catch(e){} }
+}
+
+function setStatus(t){ $('g-status').textContent = t || ''; $('netstatus').textContent = t || ''; }
+
+/* ======================= SPELTILLSTÅND ======================= */
+let G = null;           // host: sanningen. guest: senaste mottagna (redigerade) kopian
+let seat = 1;           // 1 = host, 2 = guest
+let ui = {};            // lokalt UI-tillstånd som inte delas
+let tickId = null;
+
+function newGame(n1, n2){
+  return {
+    names:{1:n1, 2:n2},
+    score:{1:0, 2:0},
+    idx:0,
+    step:'intro',
+    secs:0,
+    picks:{lucka:shuffled(LUCKOR.length), kludd:shuffled(KLUDD.length), tabu:shuffled(TABU.length)},
+    used:{lucka:0, kludd:0, tabu:0},
+    d:{},
+    ready:{1:false, 2:false}
+  };
+}
+
+function round(){ return ROUNDS[G.idx]; }
+
+/* --- host: starta en runda --- */
+function beginRound(){
+  const r = round();
+  G.step = 'play';
+  G.ready = {1:false, 2:false};
+  if (r.g === 'lucka'){
+    const i = G.picks.lucka[G.used.lucka++ % G.picks.lucka.length];
+    G.d = {prompt: LUCKOR[i], ans:{1:null, 2:null}, rate:{1:0, 2:0}, phase:'write'};
+    G.secs = WRITE_SECONDS;
+  } else if (r.g === 'kludd'){
+    const i = G.picks.kludd[G.used.kludd++ % G.picks.kludd.length];
+    G.d = {word: KLUDD[i], guesses:[], solved:false, phase:'draw'};
+    G.secs = DRAW_SECONDS;
+  } else {
+    const i = G.picks.tabu[G.used.tabu++ % G.picks.tabu.length];
+    G.d = {card: TABU[i], guesses:[], cleared:[], desc:'', foulAt:0, phase:'describe'};
+    G.secs = TABU_SECONDS;
+  }
+  startTick();
+  pushState();
+}
+
+function startTick(){
+  stopTick();
+  tickId = setInterval(() => {
+    if (!G || G.step !== 'play'){ stopTick(); return; }
+    G.secs--;
+    if (G.secs <= 0){ G.secs = 0; endRound('tid'); }
+    pushState();
+  }, 1000);
+}
+function stopTick(){ if (tickId){ clearInterval(tickId); tickId = null; } }
+
+function endRound(why){
+  stopTick();
+  const r = round();
+  G.step = 'score';
+  G.d.why = why || '';
+  G.d.gain = {1:0, 2:0};
+  if (r.g === 'lucka'){
+    G.d.gain[1] = G.d.rate[2] || 0;   // betyget spelare 2 gav spelare 1
+    G.d.gain[2] = G.d.rate[1] || 0;
+  } else if (r.g === 'kludd'){
+    if (G.d.solved){ G.d.gain[r.a] = 2; G.d.gain[r.a === 1 ? 2 : 1] = 3; }
+  } else {
+    const n = G.d.cleared.length;
+    G.d.gain[1] = n * 2; G.d.gain[2] = n * 2;
+  }
+  G.score[1] += G.d.gain[1];
+  G.score[2] += G.d.gain[2];
+  G.ready = {1:false, 2:false};
+  pushState();
+}
+
+function advance(){
+  G.idx++;
+  if (G.idx >= ROUNDS.length){ G.step = 'over'; stopTick(); pushState(); return; }
+  beginRound();
+}
+
+/* --- vad motparten får se (hemligheter bortplockade) --- */
+function redact(g, forSeat){
+  const c = JSON.parse(JSON.stringify(g));
+  const r = ROUNDS[c.idx];
+  if (!r) return c;
+  if (c.step === 'play'){
+    if (r.g === 'kludd' && forSeat !== r.a) delete c.d.word;
+    if (r.g === 'tabu'  && forSeat !== r.a) delete c.d.card;
+    if (r.g === 'lucka' && c.d.phase === 'write'){
+      const other = forSeat === 1 ? 2 : 1;
+      if (!(c.d.ans[1] && c.d.ans[2])) c.d.ans[other] = c.d.ans[other] ? '__LOCKED__' : null;
+    }
+  }
+  return c;
+}
+
+function pushState(){
+  if (seat !== 1) return;
+  send({t:'state', g:redact(G, 2)});
+  paint();
+}
+
+/* --- gäst: skicka handling till värden --- */
+function act(a, v){
+  if (seat === 1) apply(1, a, v);
+  else send({t:'act', a:a, v:v});
+}
+
+/* --- host: applicera en handling --- */
+function apply(p, a, v){
+  if (!G) return;
+  const r = round();
+  if (a === 'answer' && G.step === 'play' && r.g === 'lucka' && G.d.phase === 'write'){
+    if (G.d.ans[p]) return;
+    G.d.ans[p] = String(v || '').slice(0,140) || '(tomt)';
+    if (G.d.ans[1] && G.d.ans[2]){ G.d.phase = 'rate'; G.secs = 0; stopTick(); }
+    pushState(); return;
+  }
+  if (a === 'rate' && G.step === 'play' && r.g === 'lucka' && G.d.phase === 'rate'){
+    const n = Math.max(1, Math.min(5, Number(v)||1));
+    if (G.d.rate[p]) return;
+    G.d.rate[p] = n;
+    if (G.d.rate[1] && G.d.rate[2]) endRound('klart');
+    else pushState();
+    return;
+  }
+  if (a === 'guess' && G.step === 'play'){
+    const txt = String(v || '').slice(0,60).trim();
+    if (!txt) return;
+    if (r.g === 'kludd'){
+      if (p === r.a || G.d.solved) return;
+      const ok = norm(txt) === norm(G.d.word);
+      G.d.guesses.push({p, txt, ok});
+      if (G.d.guesses.length > 40) G.d.guesses.shift();
+      if (ok){ G.d.solved = true; endRound('rätt'); return; }
+      pushState(); return;
+    }
+    if (r.g === 'tabu'){
+      if (p === r.a) return;
+      const ok = norm(txt) === norm(G.d.card.w);
+      G.d.guesses.push({p, txt, ok});
+      if (G.d.guesses.length > 40) G.d.guesses.shift();
+      if (ok){
+        G.d.cleared.push(G.d.card.w);
+        G.d.desc = '';
+        G.d.guesses = [];
+        const i = G.picks.tabu[G.used.tabu++ % G.picks.tabu.length];
+        G.d.card = TABU[i];
+      }
+      pushState(); return;
+    }
+  }
+  if (a === 'desc' && G.step === 'play' && r.g === 'tabu' && p === r.a){
+    G.d.desc = String(v || '').slice(0,160);
+    pushState(); return;
+  }
+  if (a === 'foul' && G.step === 'play' && r.g === 'tabu' && p === r.a){
+    G.d.desc = '';
+    G.d.foulAt = Date.now();
+    pushState(); return;
+  }
+  if (a === 'ready'){
+    G.ready[p] = true;
+    if (G.ready[1] && G.ready[2]){
+      if (G.step === 'score') advance();
+      else if (G.step === 'intro') beginRound();
+      else if (G.step === 'over'){ const n = G.names; G = newGame(n[1], n[2]); beginRound(); }
+    } else pushState();
+    return;
+  }
+}
+
+/* ======================= RITNING ======================= */
+const inkBuf = [];
+let inkTimer = null;
+function flushInk(){
+  if (inkBuf.length){ send({t:'ink', p:inkBuf.splice(0, inkBuf.length)}); }
+  inkTimer = null;
+}
+function queueInk(seg){
+  inkBuf.push(seg);
+  if (!inkTimer) inkTimer = setTimeout(flushInk, 45);
+}
+
+function setupCanvas(cv, canDraw){
+  const ctx = cv.getContext('2d');
+  ui.ctx = ctx; ui.cv = cv;
+  ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+  ctx.fillStyle = '#f7fbfb'; ctx.fillRect(0,0,cv.width,cv.height);
+  ui.strokes = ui.strokes || [];
+  redrawAll();
+  if (!canDraw) return;
+
+  let drawing = false, last = null;
+  const pos = e => {
+    const r = cv.getBoundingClientRect();
+    return [ (e.clientX - r.left) / r.width, (e.clientY - r.top) / r.height ];
+  };
+  const down = e => {
+    if (e.button !== undefined && e.button !== 0) return;
+    drawing = true; last = pos(e); cv.setPointerCapture && cv.setPointerCapture(e.pointerId);
+    e.preventDefault();
+  };
+  const move = e => {
+    if (!drawing) return;
+    const p = pos(e);
+    const seg = {a:last, b:p, c:ui.color, w:ui.pen};
+    drawSeg(seg); ui.strokes.push(seg); queueInk(seg);
+    last = p; e.preventDefault();
+  };
+  const up = () => { drawing = false; last = null; };
+  cv.addEventListener('pointerdown', down);
+  cv.addEventListener('pointermove', move);
+  window.addEventListener('pointerup', up);
+  ui.cleanCanvas = () => { window.removeEventListener('pointerup', up); };
+}
+
+function drawSeg(s){
+  const ctx = ui.ctx, cv = ui.cv;
+  if (!ctx) return;
+  ctx.strokeStyle = s.c; ctx.lineWidth = s.w;
+  ctx.beginPath();
+  ctx.moveTo(s.a[0]*cv.width, s.a[1]*cv.height);
+  ctx.lineTo(s.b[0]*cv.width, s.b[1]*cv.height);
+  ctx.stroke();
+}
+function redrawAll(){
+  const ctx = ui.ctx, cv = ui.cv;
+  if (!ctx) return;
+  ctx.fillStyle = '#f7fbfb'; ctx.fillRect(0,0,cv.width,cv.height);
+  (ui.strokes||[]).forEach(drawSeg);
+}
+
+/* ======================= RENDER ======================= */
+let lastSig = '';
+function paint(){
+  if (!G){ return; }
+  if (!views.game.classList.contains('on') && G.step !== 'over') show('game');
+
+  $('scorebar').hidden = false;
+  $('sc1n').textContent = G.names[1]; $('sc2n').textContent = G.names[2];
+  $('sc1p').textContent = G.score[1]; $('sc2p').textContent = G.score[2];
+
+  if (G.step === 'over'){ paintOver(); return; }
+
+  const r = round();
+  const card = $('gamecard');
+  card.style.setProperty('--c', COLORS[r.g]);
+  $('g-chip').textContent = 'Runda ' + (G.idx+1) + '/' + ROUNDS.length;
+  $('g-chip').style.setProperty('--c', COLORS[r.g]);
+  $('g-title').textContent = TITLES[r.g];
+  $('g-title').style.setProperty('--c', COLORS[r.g]);
+
+  const showClock = G.step === 'play' && !(r.g === 'lucka' && G.d.phase === 'rate');
+  $('g-clock').hidden = !showClock;
+  if (showClock){
+    const total = r.g === 'lucka' ? WRITE_SECONDS : (r.g === 'kludd' ? DRAW_SECONDS : TABU_SECONDS);
+    $('g-ring').textContent = G.secs;
+    $('g-ring').style.setProperty('--p', Math.round((G.secs/total)*100) + '%');
+    $('g-clock').classList.toggle('low', G.secs <= 10);
+  }
+
+  // signatur: rita bara om strukturen ändras (annars förlorar vi fokus i textfält)
+  const sig = [G.idx, G.step, G.d.phase||'', r.g,
+               r.g==='lucka' ? [!!G.d.ans[1], !!G.d.ans[2], G.d.rate[1], G.d.rate[2]].join(',') : '',
+               r.g==='kludd' ? G.d.guesses.length + ':' + G.d.solved : '',
+               r.g==='tabu' ? G.d.guesses.length + ':' + G.d.cleared.length + ':' + G.d.foulAt : '',
+               G.ready[1], G.ready[2]].join('|');
+
+  if (sig !== lastSig){ lastSig = sig; buildBody(); }
+  else liveUpdate();
+}
+
+function buildBody(){
+  const r = round();
+  const body = $('g-body');
+  if (ui.cleanCanvas){ ui.cleanCanvas(); ui.cleanCanvas = null; }
+  ui.ctx = null; ui.cv = null;
+  body.innerHTML = '';
+  if (G.step === 'score'){ buildScore(body); return; }
+  if (r.g === 'lucka') buildLucka(body);
+  else if (r.g === 'kludd') buildKludd(body, r);
+  else buildTabu(body, r);
+}
+
+/* ---- Fyll i luckan ---- */
+function buildLucka(body){
+  const d = G.d;
+  const promptHtml = esc(d.prompt).replace('___', '<span class="blank">&nbsp;&nbsp;&nbsp;&nbsp;</span>');
+  const me = seat, you = seat === 1 ? 2 : 1;
+
+  if (d.phase === 'write'){
+    const mine = d.ans[me];
+    body.innerHTML =
+      `<div class="prompt">${promptHtml}</div>` +
+      (mine
+        ? `<p class="note">Låst. Väntar på ${esc(G.names[you])}…</p>
+           <div class="ans p${me}"><span class="by">Ditt svar</span><span class="tx">${esc(mine)}</span></div>`
+        : `<div class="field">
+             <label for="luckain">Fyll i hålet — ju konstigare desto bättre</label>
+             <textarea id="luckain" rows="2" maxlength="140" placeholder="Skriv ditt svar…"></textarea>
+           </div>
+           <div class="row mid"><button class="btn" id="luckago">Lås svaret</button></div>`);
+    const inp = $('luckain');
+    if (inp){
+      inp.focus();
+      const go = () => { const v = inp.value.trim(); if (!v) return; act('answer', v); };
+      $('luckago').addEventListener('click', go);
+      inp.addEventListener('keydown', e => { if (e.key === 'Enter' && !e.shiftKey){ e.preventDefault(); go(); } });
+    }
+    return;
+  }
+
+  if (d.phase === 'rate'){
+    const mine = d.rate[me];
+    body.innerHTML =
+      `<div class="prompt">${promptHtml}</div>` +
+      `<div class="answers">
+         <div class="ans p1"><span class="by">${esc(G.names[1])}</span><span class="tx">${esc(d.ans[1])}</span></div>
+         <div class="ans p2"><span class="by">${esc(G.names[2])}</span><span class="tx">${esc(d.ans[2])}</span></div>
+       </div>` +
+      (mine
+        ? `<p class="note">Du gav ${mine} 😂. Väntar på ${esc(G.names[you])}…</p>`
+        : `<p class="note">Hur roligt var <b>${esc(G.names[you])}</b>:s svar?</p>
+           <div class="stars" id="stars">
+             ${[1,2,3,4,5].map(n=>`<button class="star" data-v="${n}" title="${n} poäng">${'😂'}</button>`).join('')}
+           </div>
+           <p class="note" style="font-size:12px">Betyget blir ${esc(G.names[you])}:s poäng.</p>`);
+    const st = $('stars');
+    if (st){
+      st.addEventListener('click', e => {
+        const b = e.target.closest('.star'); if (!b) return;
+        [...st.children].forEach((c,i) => c.classList.toggle('pick', i < Number(b.dataset.v)));
+        act('rate', Number(b.dataset.v));
+      });
+      st.addEventListener('mouseover', e => {
+        const b = e.target.closest('.star'); if (!b) return;
+        [...st.children].forEach((c,i) => c.style.opacity = i < Number(b.dataset.v) ? '1' : '.45');
+      });
+      st.addEventListener('mouseleave', () => { [...st.children].forEach(c => c.style.opacity = '1'); });
+    }
+  }
+}
+
+/* ---- Kluddgissning ---- */
+function buildKludd(body, r){
+  const iDraw = seat === r.a;
+  const d = G.d;
+  if (iDraw){
+    ui.color = ui.color || '#14323c'; ui.pen = ui.pen || 5; ui.strokes = [];
+    body.innerHTML =
+      `<p class="note">Rita det här — inga bokstäver, inga siffror!</p>
+       <div class="secret">${esc(d.word.toUpperCase())}</div>
+       <div class="canvaswrap"><canvas id="cv" width="640" height="440"></canvas></div>
+       <div class="tools" id="tools">
+         <button class="swatch on" data-col="#14323c" style="background:#14323c"></button>
+         <button class="swatch" data-col="#f0522c" style="background:#f0522c"></button>
+         <button class="swatch" data-col="#2fc79b" style="background:#2fc79b"></button>
+         <button class="swatch" data-col="#f5b60a" style="background:#f5b60a"></button>
+         <button class="tool on" data-pen="5">Penna</button>
+         <button class="tool" data-pen="18">Tjock</button>
+         <button class="tool" data-pen="26" data-erase="1">Sudd</button>
+         <button class="tool" id="clr">Rensa allt</button>
+       </div>
+       <div class="feed" id="feed"></div>`;
+    setupCanvas($('cv'), true);
+    $('tools').addEventListener('click', e => {
+      const sw = e.target.closest('.swatch');
+      if (sw){
+        ui.color = sw.dataset.col;
+        [...$('tools').querySelectorAll('.swatch')].forEach(x => x.classList.toggle('on', x === sw));
+        return;
+      }
+      const t = e.target.closest('.tool'); if (!t) return;
+      if (t.id === 'clr'){
+        ui.strokes = []; redrawAll(); send({t:'ink', clear:true}); return;
+      }
+      ui.pen = Number(t.dataset.pen);
+      ui.color = t.dataset.erase ? '#f7fbfb' : (ui.color === '#f7fbfb' ? '#14323c' : ui.color);
+      [...$('tools').querySelectorAll('.tool')].forEach(x => x.classList.toggle('on', x === t));
+      if (t.dataset.erase){ [...$('tools').querySelectorAll('.swatch')].forEach(x => x.classList.remove('on')); }
+    });
+  } else {
+    body.innerHTML =
+      `<p class="note"><b>${esc(G.names[r.a])}</b> ritar. Skriv allt du kommer på — det kostar inget att gissa fel.</p>
+       <div class="canvaswrap"><canvas id="cv" width="640" height="440"></canvas></div>
+       <div class="row">
+         <input type="text" id="gin" class="grow" maxlength="40" placeholder="Din gissning…" autocomplete="off">
+         <button class="btn sm" id="gsend">Gissa</button>
+       </div>
+       <div class="feed" id="feed"></div>`;
+    setupCanvas($('cv'), false);
+    const inp = $('gin');
+    const go = () => { const v = inp.value.trim(); if (!v) return; inp.value = ''; act('guess', v); };
+    $('gsend').addEventListener('click', go);
+    inp.addEventListener('keydown', e => { if (e.key === 'Enter') go(); });
+    inp.focus();
+  }
+  renderFeed(d.guesses);
+}
+
+/* ---- Förbjudna ord ---- */
+function buildTabu(body, r){
+  const iTalk = seat === r.a;
+  const d = G.d;
+  const cleared = d.cleared.length
+    ? `<div class="cleared">${d.cleared.map(w=>`<span>✔ ${esc(w)}</span>`).join('')}</div>` : '';
+  if (iTalk){
+    body.innerHTML =
+      `<p class="note">Beskriv ordet. Använder du något av de spärrade orden nollställs rutan.</p>
+       <div class="secret">${esc(d.card.w)}</div>
+       <div class="banned">${d.card.b.map(w=>`<span>${esc(w)}</span>`).join('')}</div>
+       <div class="field">
+         <label for="descin">Din beskrivning (syns direkt hos motståndaren)</label>
+         <textarea id="descin" rows="2" maxlength="160" placeholder="Skriv fritt…"></textarea>
+       </div>
+       ${cleared}
+       <div class="feed" id="feed"></div>`;
+    const inp = $('descin');
+    inp.value = d.desc || '';
+    inp.focus();
+    inp.addEventListener('input', () => {
+      const raw = inp.value;
+      const n = norm(raw);
+      const hit = d.card.b.some(b => n.includes(norm(b))) || n.includes(norm(d.card.w));
+      if (hit){
+        inp.value = '';
+        act('foul');
+        const box = $('feed');
+        if (box){ box.insertAdjacentHTML('afterbegin', '<div class="g ok" style="background:rgba(255,92,92,.18);border-color:var(--bad);color:#ffb0b0">FÖRBJUDET ORD! Rutan är rensad.</div>'); }
+        return;
+      }
+      act('desc', raw);
+    });
+  } else {
+    body.innerHTML =
+      `<p class="note"><b>${esc(G.names[r.a])}</b> försöker beskriva ett ord. Gissa så fort du kan!</p>
+       <div class="live empty" id="live">väntar på beskrivning…</div>
+       <div class="row">
+         <input type="text" id="gin" class="grow" maxlength="40" placeholder="Vilket ord är det?" autocomplete="off">
+         <button class="btn sm" id="gsend">Gissa</button>
+       </div>
+       ${cleared}
+       <div class="feed" id="feed"></div>`;
+    const inp = $('gin');
+    const go = () => { const v = inp.value.trim(); if (!v) return; inp.value = ''; act('guess', v); };
+    $('gsend').addEventListener('click', go);
+    inp.addEventListener('keydown', e => { if (e.key === 'Enter') go(); });
+    inp.focus();
+    liveUpdate();
+  }
+  renderFeed(d.guesses);
+}
+
+function liveUpdate(){
+  const r = round();
+  if (!r || G.step !== 'play') return;
+  if (r.g === 'tabu' && seat !== r.a){
+    const el = $('live');
+    if (el){
+      const t = (G.d.desc || '').trim();
+      el.textContent = t || 'väntar på beskrivning…';
+      el.classList.toggle('empty', !t);
+      if (G.d.foulAt && G.d.foulAt !== ui.lastFoul){
+        ui.lastFoul = G.d.foulAt;
+        el.classList.add('foul');
+        setTimeout(()=>el.classList.remove('foul'), 500);
+      }
+    }
+  }
+}
+
+function renderFeed(list){
+  const el = $('feed');
+  if (!el) return;
+  el.innerHTML = (list||[]).slice(-14).reverse().map(g =>
+    `<div class="g ${g.ok?'ok':(g.p===seat?'me':'')}">${g.ok?'✔ ':''}${esc(g.txt)}<small>${esc(G.names[g.p])}</small></div>`
+  ).join('');
+}
+
+/* ---- rundresultat ---- */
+function buildScore(body){
+  const r = round();
+  const d = G.d;
+  let head = '', sub = '';
+  if (r.g === 'lucka'){
+    head = 'Skrattbetygen är inne';
+    sub = `<div class="answers">
+      <div class="ans p1"><span class="by">${esc(G.names[1])} · ${d.rate[2]||0} poäng</span><span class="tx">${esc(d.ans[1]||'—')}</span></div>
+      <div class="ans p2"><span class="by">${esc(G.names[2])} · ${d.rate[1]||0} poäng</span><span class="tx">${esc(d.ans[2]||'—')}</span></div>
+    </div>`;
+  } else if (r.g === 'kludd'){
+    head = d.solved ? 'Gissat!' : 'Tiden tog slut';
+    sub = `<p class="note">Ordet var <b style="color:var(--sun);font-size:19px">${esc((d.word||'???').toUpperCase())}</b></p>`;
+  } else {
+    head = d.cleared.length ? `${d.cleared.length} ord i hamn!` : 'Inga ord den här gången';
+    sub = d.cleared.length ? `<div class="cleared">${d.cleared.map(w=>`<span>✔ ${esc(w)}</span>`).join('')}</div>` : '';
+  }
+  const waiting = G.ready[seat];
+  body.innerHTML =
+    `<div class="result">
+       <h2>${esc(head)}</h2>
+       ${sub}
+       <div class="gained">
+         <div class="gain"><div class="who">${esc(G.names[1])}</div><div class="val">+${d.gain[1]}</div></div>
+         <div class="gain"><div class="who">${esc(G.names[2])}</div><div class="val">+${d.gain[2]}</div></div>
+       </div>
+       ${waiting
+          ? `<p class="note"><span class="waiting"><span class="dot"></span> Väntar på motståndaren…</span></p>`
+          : `<button class="btn" id="nextb">${G.idx+1 >= ROUNDS.length ? 'Se resultatet' : 'Nästa runda'}</button>`}
+     </div>`;
+  const nb = $('nextb');
+  if (nb) nb.addEventListener('click', () => { nb.disabled = true; act('ready'); });
+}
+
+function paintOver(){
+  show('over');
+  const a = G.score[1], b = G.score[2];
+  const win = a === b ? 0 : (a > b ? 1 : 2);
+  $('tr').textContent = win === 0 ? '🤝' : '🏆';
+  $('over-head').textContent = win === 0 ? 'Oavgjort!' : G.names[win] + ' vinner!';
+  $('over-tally').textContent = a + ' — ' + b;
+  $('over-note').textContent = win === 0
+    ? 'Ni är exakt lika roliga. Det måste avgöras.'
+    : (seat === win ? 'Snyggt jobbat. Ta en till innan formen försvinner.' : 'Revansch?');
+  const ab = $('b-again');
+  ab.disabled = !!G.ready[seat];
+  ab.textContent = G.ready[seat] ? 'Väntar på motståndaren…' : 'Spela igen';
+}
+
+/* ======================= MOTTAGNING ======================= */
+Net.onData = msg => {
+  if (!msg || typeof msg !== 'object') return;
+  if (msg.t === 'hello'){
+    if (seat === 1 && G){
+      G.names[2] = String(msg.name || 'Spelare 2').slice(0,12);
+      pushState();
+    }
+    return;
+  }
+  if (msg.t === 'state' && seat === 2){
+    G = msg.g;
+    if (G.step === 'over') paintOver(); else paint();
+    return;
+  }
+  if (msg.t === 'act' && seat === 1){ apply(2, msg.a, msg.v); return; }
+  if (msg.t === 'emo'){ floatEmoji(String(msg.e || '🎉').slice(0,4)); return; }
+  if (msg.t === 'ink'){
+    if (msg.clear){ ui.strokes = []; redrawAll(); return; }
+    if (Array.isArray(msg.p)){
+      msg.p.forEach(s => { ui.strokes = ui.strokes || []; ui.strokes.push(s); drawSeg(s); });
+    }
+    return;
+  }
+};
+
+Net.onClose = () => {
+  stopTick();
+  setStatus('Motståndaren tappade anslutningen.');
+  if (views.game.classList.contains('on')){
+    $('g-body').innerHTML = `<div class="result"><h2>Anslutningen bröts</h2>
+      <p class="note">Din kompis försvann. Starta ett nytt rum så kan ni köra igen.</p>
+      <button class="btn" onclick="location.reload()">Till startsidan</button></div>`;
+    $('g-clock').hidden = true;
+  }
+};
+
+/* ======================= START / ANSLUTNING ======================= */
+function shareUrl(code){
+  return location.origin + location.pathname + '#' + code;
+}
+
+async function createRoom(){
+  $('lobby-err').textContent = '';
+  if (!myName){ $('lobby-err').textContent = 'Skriv ditt namn först.'; $('nick').focus(); return; }
+  $('b-create').disabled = true; $('b-joinview').disabled = true;
+  setStatus('Öppnar rum…');
+  for (let attempt = 0; attempt < 4; attempt++){
+    const code = rndCode();
+    try {
+      const p = await makePeer(PREFIX + code);
+      Net.peer = p; Net.isHost = true; Net.code = code; seat = 1;
+      p.on('connection', conn => {
+        if (Net.conn && Net.ready){ try{conn.close();}catch(e){} return; }
+        wireConn(conn);
+        Net.onOpen = () => {
+          setStatus('Ansluten.');
+          G = newGame(myName, 'Spelare 2');
+          G.step = 'intro';
+          beginRound();
+        };
+      });
+      $('wait-code').textContent = code;
+      $('sharelink').value = shareUrl(code);
+      show('wait');
+      setStatus('Rummet är öppet. Kod ' + code);
+      return;
+    } catch(err){
+      if (err && err.type === 'unavailable-id') continue;
+      $('b-create').disabled = false; $('b-joinview').disabled = false;
+      $('lobby-err').textContent = (err && err.message === 'noscript')
+        ? 'Kunde inte ladda nätverksbiblioteket. Kolla internet och ladda om.'
+        : 'Kunde inte öppna rummet. Prova igen om en stund.';
+      setStatus('');
+      return;
+    }
+  }
+  $('b-create').disabled = false; $('b-joinview').disabled = false;
+  $('lobby-err').textContent = 'Alla koder upptagna just nu. Prova igen.';
+}
+
+async function joinRoom(code){
+  $('join-err').textContent = '';
+  code = (code||'').toUpperCase().replace(/[^A-Z0-9]/g,'').slice(0,4);
+  if (code.length !== 4){ $('join-err').textContent = 'Koden är fyra tecken.'; return; }
+  if (!myName){ $('join-err').textContent = 'Skriv ditt namn först.'; $('nick2').focus(); return; }
+  $('b-join').disabled = true;
+  setStatus('Söker rum ' + code + '…');
+  try {
+    const p = await makePeer(null);
+    Net.peer = p; Net.isHost = false; Net.code = code; seat = 2;
+    const conn = p.connect(PREFIX + code, {reliable:true});
+    let opened = false;
+    const to = setTimeout(() => {
+      if (!opened){
+        $('b-join').disabled = false;
+        $('join-err').textContent = 'Ingen svarar på den koden. Är rummet fortfarande öppet?';
+        try{ conn.close(); }catch(e){}
+      }
+    }, 11000);
+    Net.onOpen = () => {
+      opened = true; clearTimeout(to);
+      setStatus('Ansluten.');
+      send({t:'hello', name:myName});
+      show('game');
+      $('g-body').innerHTML = '<p class="note">Ansluten! Startar…</p>';
+    };
+    wireConn(conn);
+  } catch(err){
+    $('b-join').disabled = false;
+    $('join-err').textContent = (err && err.message === 'noscript')
+      ? 'Kunde inte ladda nätverksbiblioteket. Kolla internet och ladda om.'
+      : 'Kunde inte ansluta. Prova igen.';
+  }
+}
+
+/* ======================= EVENTS ======================= */
+$('b-create').addEventListener('click', createRoom);
+$('b-joinview').addEventListener('click', () => { show('join'); $('joincode').focus(); });
+$('b-join').addEventListener('click', () => joinRoom($('joincode').value));
+$('joincode').addEventListener('input', e => { e.target.value = e.target.value.toUpperCase().replace(/[^A-Z0-9]/g,''); });
+$('joincode').addEventListener('keydown', e => { if (e.key === 'Enter') joinRoom($('joincode').value); });
+$('b-again').addEventListener('click', () => { $('b-again').disabled = true; act('ready'); });
+$('b-copy').addEventListener('click', async () => {
+  const v = $('sharelink').value;
+  try { await navigator.clipboard.writeText(v); $('b-copy').textContent = 'Kopierad!'; }
+  catch(e){ $('sharelink').select(); document.execCommand && document.execCommand('copy'); $('b-copy').textContent = 'Kopierad!'; }
+  setTimeout(()=>{ $('b-copy').textContent = 'Kopiera'; }, 1600);
+});
+document.querySelectorAll('[data-back]').forEach(b => b.addEventListener('click', () => location.reload()));
+$('reacts').addEventListener('click', e => {
+  const b = e.target.closest('.react'); if (!b) return;
+  floatEmoji(b.dataset.emo);
+  send({t:'emo', e:b.dataset.emo});
+});
+
+/* djuplänk: #KOD */
+(function(){
+  const h = (location.hash || '').replace('#','').toUpperCase().replace(/[^A-Z0-9]/g,'').slice(0,4);
+  if (h.length === 4){
+    $('joincode').value = h;
+    show('join');
+    setTimeout(()=>{ (myName ? $('b-join') : $('nick2')).focus(); }, 60);
+  }
+})();
+
+setStatus(typeof Peer === 'undefined' ? 'Nätverksbiblioteket kunde inte laddas.' : 'Redo.');
+})();
+</script>
+</body>
+</html>
